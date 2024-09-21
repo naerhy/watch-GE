@@ -8,6 +8,18 @@
   width: 300px;
 }
 
+.mode-btn {
+  bottom: 20px;
+  left: 20px;
+  position: absolute;
+}
+
+.increase-btn {
+  left: 20px;
+  position: absolute;
+  top: 20px;
+}
+
 .remove-btn {
   position: absolute;
   right: 20px;

@@ -14,21 +14,25 @@ export default class WatchesController {
   }
 
   public start(): void {
-    this.watchesView.setAddBtnEvent(() => this.addWatch());
-    this.watchesView.setRemoveBtnEvent((id: number) => this.removeWatch(id));
+    this.watchesView.setAddBtnEvent(() => {
+      this.watchesModel.add();
+      this.watchesView.render(this.watchesModel.getWatches());
+    });
+    this.watchesView.setModeBtnEvent((id: number) => {
+      this.watchesModel.switchMode(id);
+      this.watchesView.render(this.watchesModel.getWatches());
+    });
+    this.watchesView.setIncreaseBtnEvent((id: number) => {
+      this.watchesModel.increaseTime(id);
+      this.watchesView.render(this.watchesModel.getWatches());
+    });
+    this.watchesView.setRemoveBtnEvent((id: number) => {
+      this.watchesModel.remove(id);
+      this.watchesView.render(this.watchesModel.getWatches());
+    });
     setInterval(() => {
       this.timeModel.updateTime();
       this.watchesView.render(this.watchesModel.getWatches());
     }, 1000);
-  }
-
-  private addWatch(): void {
-    this.watchesModel.addWatch();
-    this.watchesView.render(this.watchesModel.getWatches());
-  }
-
-  private removeWatch(id: number): void {
-    this.watchesModel.removeWatch(id);
-    this.watchesView.render(this.watchesModel.getWatches());
   }
 }

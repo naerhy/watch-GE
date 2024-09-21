@@ -1,8 +1,8 @@
-import { Observer, Subject, Time } from "../shared";
+import { Observer, Subject } from "../shared";
 
 // TODO: create Observer class/model to replace WatchModel
 export default class TimeModel implements Subject {
-  private time: Time;
+  private time: number;
   private observers: Observer[];
   private static instance: TimeModel;
 
@@ -30,12 +30,11 @@ export default class TimeModel implements Subject {
     }
   }
 
-  private getCurrentTime(): Time {
-    const date = new Date();
-    return { hours: date.getHours(), minutes: date.getMinutes(), seconds: date.getSeconds() };
+  private getCurrentTime(): number {
+    return new Date().getTime();
   }
 
-  public getTime(): Time {
+  public getTime(): number {
     return this.time;
   }
 
