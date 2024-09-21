@@ -6,12 +6,14 @@ export default class WatchModel implements Observer {
   private time: number;
   private mode: number;
   private increasedTime: number;
+  private light: boolean;
 
   public constructor(id: number, time: number) {
     this.id = id;
     this.time = time;
     this.mode = 0;
     this.increasedTime = 0;
+    this.light = false;
   }
 
   public getId(): number {
@@ -34,6 +36,14 @@ export default class WatchModel implements Observer {
     } else if (this.mode === 2) {
       this.increasedTime += 60000;
     } else {}
+  }
+
+  public getLight(): boolean {
+    return this.light;
+  }
+
+  public toggleLight(): void {
+    this.light = !this.light;
   }
 
   public update(subject: Subject): void {

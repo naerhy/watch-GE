@@ -26,6 +26,10 @@ export default class WatchesController {
       this.watchesModel.increaseTime(id);
       this.watchesView.render(this.watchesModel.getWatches());
     });
+    this.watchesView.setToggleLightBtnEvent((id: number) => {
+      this.watchesModel.toggleLight(id);
+      this.watchesView.render(this.watchesModel.getWatches());
+    });
     this.watchesView.setRemoveBtnEvent((id: number) => {
       this.watchesModel.remove(id);
       this.watchesView.render(this.watchesModel.getWatches());

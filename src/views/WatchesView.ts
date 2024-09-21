@@ -6,6 +6,7 @@ export default class WatchesView {
   private currentList: HTMLUListElement;
   private modeBtnEvent?: ((id: number) => void);
   private increaseBtnEvent?: ((id: number) => void);
+  private toggleLightBtnEvent?: ((id: number) => void);
   private removeBtnEvent?: ((id: number) => void);
 
   public constructor() {
@@ -29,6 +30,10 @@ export default class WatchesView {
     this.increaseBtnEvent = evt;
   }
 
+  public setToggleLightBtnEvent(evt: (id: number) => void): void {
+    this.toggleLightBtnEvent = evt;
+  }
+
   public setRemoveBtnEvent(evt: (id: number) => void): void {
     this.removeBtnEvent = evt;
   }
@@ -39,6 +44,7 @@ export default class WatchesView {
       const li = document.createElement("li");
       li.classList.add("watch");
       const div = document.createElement("div");
+      div.style.backgroundColor = w.getLight() ? "#FBE106" : "#FFFFFF";
       div.innerText = w.getTimeText();
       const modeBtn = document.createElement("button");
       modeBtn.classList.add("mode-btn");
@@ -52,13 +58,19 @@ export default class WatchesView {
       increaseBtn.addEventListener("click", () => {
         this.increaseBtnEvent?.(w.getId());
       }, { once: true });
+      const toggleLightBtn = document.createElement("button");
+      toggleLightBtn.classList.add("toggle-light-btn");
+      toggleLightBtn.textContent = "Light";
+      toggleLightBtn.addEventListener("click", () => {
+        this.toggleLightBtnEvent?.(w.getId());
+      }, { once: true });
       const removeBtn = document.createElement("button");
       removeBtn.classList.add("remove-btn");
       removeBtn.textContent = "Remove";
       removeBtn.addEventListener("click", () => {
         this.removeBtnEvent?.(w.getId());
       }, { once: true });
-      li.append(div, modeBtn, increaseBtn, removeBtn);
+      li.append(div, modeBtn, increaseBtn, toggleLightBtn, removeBtn);
       list.appendChild(li);
     }
     this.mainElement.replaceChild(list, this.currentList);

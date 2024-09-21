@@ -37,6 +37,13 @@ export default class WatchesModel {
     }
   }
 
+  public toggleLight(id: number): void {
+    const index = this.watches.findIndex((w) => w.getId() === id);
+    if (index !== -1) {
+      this.watches[index].toggleLight();
+    }
+  }
+
   public remove(id: number): void {
     const index = this.watches.findIndex((w) => w.getId() === id);
     if (index !== -1) {
