@@ -50,6 +50,29 @@ export default class WatchesView {
 
   public addItem(watch: Watch): void {
     const item = document.createElement("li");
+    item.draggable = true;
+    item.addEventListener("dragstart", (evt) => {
+      if (evt.dataTransfer) {
+        evt.dataTransfer.setData("text/plain", watch.id.toString());
+        evt.dataTransfer.effectAllowed = "move";
+      }
+    });
+    item.addEventListener("dragover", (evt) => evt.preventDefault());
+    item.addEventListener("drop", (evt) => {
+      evt.preventDefault();
+      const data = evt.dataTransfer?.getData("text/plain");
+      if (data && Number(data) !== watch.id) {
+        const first = this.watchesItems.get(Number(data));
+        const second = this.watchesItems.get(watch.id);
+        if (first && second) {
+          const children = Array.from(this.watchesList.children);
+          const indexes: [number, number] = [children.indexOf(first), children.indexOf(second)];
+          [children[indexes[0]], children[indexes[1]]] = [children[indexes[1]], children[indexes[0]]];
+          this.watchesList.innerHTML = "";
+          this.watchesList.append(...children);
+        }
+      }
+    });
     const timeText = document.createElement("div");
     timeText.classList.add("time-text");
     timeText.innerText = watch.time;
