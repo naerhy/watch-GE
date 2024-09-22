@@ -2,9 +2,11 @@ import { UtcTimeZone, utcTimezones, type Watch } from "../shared";
 
 type FnWithId = (id: number) => void;
 type Fns = [FnWithId, FnWithId, FnWithId, FnWithId, FnWithId, FnWithId];
+type WatchType = "analog" | "digital";
 
 export default class WatchesView {
   private selectTz: HTMLSelectElement;
+  private selectWatchType: HTMLSelectElement;
   private addBtn: HTMLButtonElement;
   private watchesList: HTMLUListElement;
   private watchesItems: Map<number, HTMLLIElement>;
@@ -26,19 +28,27 @@ export default class WatchesView {
       opt.selected = tz === "UTC+00:00";
       this.selectTz.appendChild(opt);
     }
+    this.selectWatchType = document.createElement("select");
+    for (const t of ["analog", "digital"]) {
+      const opt = document.createElement("option");
+      opt.value = t;
+      opt.textContent = t;
+      opt.selected = t === "digital";
+      this.selectWatchType.appendChild(opt);
+    }
     this.addBtn = document.createElement("button");
     this.addBtn.type = "button";
     this.addBtn.textContent = "Add";
-    addDiv.append(this.selectTz, this.addBtn);
+    addDiv.append(this.selectTz, this.selectWatchType, this.addBtn);
     this.watchesList = document.createElement("ul");
     mainElement.append(addDiv, this.watchesList);
     this.watchesItems = new Map();
     document.body.appendChild(mainElement);
   }
 
-  public setEvents(addBtnFn: (utcTimezone: UtcTimeZone) => void, fns: Fns) {
+  public setEvents(addBtnFn: (type: WatchType, utcTimezone: UtcTimeZone) => void, fns: Fns) {
     this.addBtn.addEventListener("click", () => {
-      addBtnFn(this.selectTz.value as UtcTimeZone);
+      addBtnFn(this.selectWatchType.value as WatchType, this.selectTz.value as UtcTimeZone);
     });
     this.switchModeBtnFn = fns[0];
     this.increaseBtnFn = fns[1];
@@ -48,9 +58,24 @@ export default class WatchesView {
     this.removeBtnFn = fns[5];
   }
 
-  public addItem(watch: Watch): void {
+  public addWatch(type: WatchType, watch: Watch): void {
     const item = document.createElement("li");
+    item.classList.add(type);
     this.setDragEvents(item, watch.id);
+    type === "analog" ? this.addAnalogWatch(item) : this.addDigitalWatch(item, watch);
+    this.watchesItems.set(watch.id, item);
+    this.watchesList.appendChild(item);
+  }
+
+  private addAnalogWatch(item: HTMLLIElement): void {
+    for (const i of [0, 1, 2]) {
+      const el = document.createElement("div");
+      el.classList.add("hand", `h-${i}`);
+      item.appendChild(el);
+    }
+  }
+
+  private addDigitalWatch(item: HTMLLIElement, watch: Watch): void {
     const timeText = document.createElement("div");
     timeText.classList.add("time-text");
     timeText.innerText = watch.time;
@@ -77,8 +102,6 @@ export default class WatchesView {
       toggleLightBtn,
       removeBtn
     );
-    this.watchesItems.set(watch.id, item);
-    this.watchesList.appendChild(item);
   }
 
   private setDragEvents(element: HTMLElement, id: number): void {
@@ -127,9 +150,30 @@ export default class WatchesView {
     for (const w of watches) {
       const item = this.watchesItems.get(w.id);
       if (item) {
-        const timeText = item.querySelector(".time-text");
-        if (timeText) {
-          timeText.textContent = w.time;
+        if (item.classList.contains("analog")) {
+          const [hours, minutes, seconds] = w.time.split(":").map((t) => Number(t));
+          const radians = [
+            (((hours + minutes / 60) / 12) * 360) * (Math.PI / 180),
+            (((minutes + seconds / 60) / 60) * 360) * (Math.PI / 180),
+            ((seconds / 60) * 360) * (Math.PI / 180)
+          ];
+          const hands = item.querySelectorAll<HTMLElement>(".hand");
+          for (const [i, h] of hands.entries()) {
+            const matrix = [
+              Math.cos(radians[i]),
+              Math.sin(radians[i]),
+              -Math.sin(radians[i]),
+              Math.cos(radians[i]),
+              0,
+              0
+            ];
+            h.style.transform = `matrix(${matrix.join(", ")})`;
+          }
+        } else {
+          const timeText = item.querySelector(".time-text");
+          if (timeText) {
+            timeText.textContent = w.time;
+          }
         }
       }
     }

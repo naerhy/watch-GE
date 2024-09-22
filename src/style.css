@@ -6,17 +6,49 @@ ul {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
+  list-style: none;
 }
 
 li {
+  height: 250px;
+  position: relative;
+  width: 250px;
+}
+
+.digital {
   align-items: center;
   background-color: #4b5563;
   border-radius: 1.5rem;
   display: flex;
-  height: 250px;
   justify-content: center;
-  position: relative;
-  width: 250px;
+}
+
+.analog {
+  border: 2px solid red;
+  border-radius: 50%;
+}
+
+.hand {
+  bottom: 50%;
+  left: 50%;
+  position: absolute;
+  transform-origin: bottom;
+  width: 2px;
+}
+
+.h-0 {
+  background-color: blue;
+  height: 60px;
+}
+
+.h-1 {
+  background-color: green;
+  height: 90px;
+}
+
+.h-2 {
+  background-color: red;
+  height: 120px;
 }
 
 li > button {

@@ -1,6 +1,5 @@
 import TimeModel from "../models/TimeModel";
 import WatchesModel from "../models/WatchesModel";
-import { UtcTimeZone } from "../shared";
 import WatchesView from "../views/WatchesView";
 
 export default class WatchesController {
@@ -16,32 +15,33 @@ export default class WatchesController {
 
   public start(): void {
     this.watchesView.setEvents(
-      (utcTimezone: UtcTimeZone) => {
+      (type, utcTimezone) => {
         const newWatch = this.watchesModel.add(utcTimezone);
-        this.watchesView.addItem(newWatch);
+        this.watchesView.addWatch(type, newWatch);
+        this.watchesView.updateTimeTexts(this.watchesModel.getWatches());
       },
       [
-        (id: number) => {
+        (id) => {
           this.watchesModel.switchMode(id);
           this.watchesView.updateTimeTexts(this.watchesModel.getWatches());
         },
-        (id: number) => {
+        (id) => {
           this.watchesModel.increaseTime(id);
           this.watchesView.updateTimeTexts(this.watchesModel.getWatches());
         },
-        (id: number) => {
+        (id) => {
           this.watchesModel.resetTime(id);
           this.watchesView.updateTimeTexts(this.watchesModel.getWatches());
         },
-        (id: number) => {
+        (id) => {
           this.watchesModel.toggleTimeFormat(id);
           this.watchesView.updateTimeTexts(this.watchesModel.getWatches());
         },
-        (id: number) => {
+        (id) => {
           this.watchesModel.toggleLight(id);
           this.watchesView.updateLight(id, this.watchesModel.getWatch(id).light);
         },
-        (id: number) => {
+        (id) => {
           this.watchesModel.remove(id);
           this.watchesView.removeItem(id);
         }
