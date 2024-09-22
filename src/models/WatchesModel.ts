@@ -7,6 +7,7 @@ class WatchModel implements Observer {
   private utcTimezone: UtcTimeZone;
   private mode: number;
   private increasedTime: number;
+  private timeFormat: 24 | 12;
   private light: boolean;
 
   private readonly MS_MIN = 60000;
@@ -18,6 +19,7 @@ class WatchModel implements Observer {
     this.utcTimezone = utcTimezone;
     this.mode = 0;
     this.increasedTime = 0;
+    this.timeFormat = 24;
     this.light = false;
   }
 
@@ -26,15 +28,21 @@ class WatchModel implements Observer {
   }
 
   public getTimeText(): string {
-    const updatedTime = new Date(
+    const updatedDate = new Date(
       this.time + (utcOffsets[this.utcTimezone] * this.MS_MIN) + this.increasedTime
     );
     const digits = [
-      updatedTime.getUTCHours(),
-      updatedTime.getUTCMinutes(),
-      updatedTime.getUTCSeconds()
+      updatedDate.getUTCHours(),
+      updatedDate.getUTCMinutes(),
+      updatedDate.getUTCSeconds()
     ];
-    return digits.map((t) => t.toString().padStart(2, "0")).join(":");
+    let ampm = "";
+    if (this.timeFormat === 12) {
+      ampm = digits[0] >= 12 ? " PM" : " AM";
+      const hours = digits[0] % 12;
+      digits[0] = hours ? hours : 12;
+    }
+    return digits.map((t) => t.toString().padStart(2, "0")).join(":") + ampm;
   }
 
   public getLight(): boolean {
@@ -55,6 +63,10 @@ class WatchModel implements Observer {
 
   public resetTime(): void {
     this.increasedTime = 0;
+  }
+
+  public toggleTimeFormat(): void {
+    this.timeFormat = this.timeFormat === 12 ? 24 : 12;
   }
 
   public toggleLight(): void {
@@ -134,6 +146,11 @@ export default class WatchesModel {
   public resetTime(id: number): void {
     const index = this.getWatchIndex(id);
     this.watches[index].resetTime();
+  }
+
+  public toggleTimeFormat(id: number): void {
+    const index = this.getWatchIndex(id);
+    this.watches[index].toggleTimeFormat();
   }
 
   public toggleLight(id: number): void {

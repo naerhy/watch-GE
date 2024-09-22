@@ -1,7 +1,7 @@
 import { UtcTimeZone, utcTimezones, type Watch } from "../shared";
 
 type FnWithId = (id: number) => void;
-type Fns = [FnWithId, FnWithId, FnWithId, FnWithId, FnWithId];
+type Fns = [FnWithId, FnWithId, FnWithId, FnWithId, FnWithId, FnWithId];
 
 export default class WatchesView {
   private selectTz: HTMLSelectElement;
@@ -11,6 +11,7 @@ export default class WatchesView {
   private modeBtnFn?: FnWithId;
   private increaseBtnFn?: FnWithId;
   private resetBtnFn?: FnWithId;
+  private toggleTimeFormatBtn?: FnWithId;
   private toggleLightBtnFn?: FnWithId;
   private removeBtnFn?: FnWithId;
 
@@ -42,8 +43,9 @@ export default class WatchesView {
     this.modeBtnFn = fns[0];
     this.increaseBtnFn = fns[1];
     this.resetBtnFn = fns[2];
-    this.toggleLightBtnFn = fns[3];
-    this.removeBtnFn = fns[4];
+    this.toggleTimeFormatBtn = fns[3];
+    this.toggleLightBtnFn = fns[4];
+    this.removeBtnFn = fns[5];
   }
 
   public addItem(watch: Watch): void {
@@ -69,6 +71,12 @@ export default class WatchesView {
     resetBtn.addEventListener("click", () => {
       this.resetBtnFn?.(watch.id);
     });
+    const toggleTimeFormatBtn = document.createElement("button");
+    toggleTimeFormatBtn.classList.add("toggle-time-format-btn");
+    toggleTimeFormatBtn.textContent = "AM/PM - 24H";
+    toggleTimeFormatBtn.addEventListener("click", () => {
+      this.toggleTimeFormatBtn?.(watch.id);
+    });
     const toggleLightBtn = document.createElement("button");
     toggleLightBtn.classList.add("toggle-light-btn");
     toggleLightBtn.textContent = "Light";
@@ -81,7 +89,15 @@ export default class WatchesView {
     removeBtn.addEventListener("click", () => {
       this.removeBtnFn?.(watch.id);
     }, { once: true });
-    item.append(timeText, modeBtn, increaseBtn, resetBtn, toggleLightBtn, removeBtn);
+    item.append(
+      timeText,
+      modeBtn,
+      increaseBtn,
+      resetBtn,
+      toggleTimeFormatBtn,
+      toggleLightBtn,
+      removeBtn
+    );
     this.watchesItems.set(watch.id, item);
     this.watchesList.appendChild(item);
   }

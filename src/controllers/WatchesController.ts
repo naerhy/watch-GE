@@ -34,6 +34,10 @@ export default class WatchesController {
           this.watchesView.updateTimeTexts(this.watchesModel.getWatches());
         },
         (id: number) => {
+          this.watchesModel.toggleTimeFormat(id);
+          this.watchesView.updateTimeTexts(this.watchesModel.getWatches());
+        },
+        (id: number) => {
           this.watchesModel.toggleLight(id);
           this.watchesView.updateLight(id, this.watchesModel.getWatch(id).light);
         },

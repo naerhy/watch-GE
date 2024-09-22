@@ -43,6 +43,11 @@ li > button {
   right: 20px;
 }
 
+.toggle-time-format-btn {
+  left: 20px;
+  top: 60px;
+}
+
 .toggle-light-btn {
   bottom: 20px;
   right: 20px;
