@@ -53,7 +53,6 @@ class WatchModel implements Observer {
   }
 }
 
-
 export default class WatchesModel {
   private timeModel: TimeModel;
   private watches: WatchModel[];
@@ -73,12 +72,23 @@ export default class WatchesModel {
     };
   }
 
+  private getWatchIndex(id: number): number {
+    const index = this.watches.findIndex((w) => w.getId() === id);
+    if (index === -1) {
+      throw new Error(`Cannot find index for watch with id ${id}`);
+    }
+    return index;
+  }
+
   public getWatches(): Watch[] {
     return this.watches.map((w) => this.transformModelToObject(w));
   }
 
   public getWatch(id: number): Watch {
-    const watch = this.watches[id];
+    const watch = this.watches.find((w) => w.getId() === id);
+    if (!watch) {
+      throw new Error(`Cannot find watch with id ${id}`);
+    }
     return this.transformModelToObject(watch);
   }
 
@@ -91,31 +101,23 @@ export default class WatchesModel {
   }
 
   public remove(id: number): void {
-    const index = this.watches.findIndex((w) => w.getId() === id);
-    if (index !== -1) {
-      this.timeModel.detach(this.watches[index]);
-      this.watches.splice(index, 1);
-    }
+    const index = this.getWatchIndex(id);
+    this.timeModel.detach(this.watches[index]);
+    this.watches.splice(index, 1);
   }
 
   public switchMode(id: number): void {
-    const index = this.watches.findIndex((w) => w.getId() === id);
-    if (index !== -1) {
-      this.watches[index].switchMode();
-    }
+    const index = this.getWatchIndex(id);
+    this.watches[index].switchMode();
   }
 
   public increaseTime(id: number): void {
-    const index = this.watches.findIndex((w) => w.getId() === id);
-    if (index !== -1) {
-      this.watches[index].increaseTime();
-    }
+    const index = this.getWatchIndex(id);
+    this.watches[index].increaseTime();
   }
 
   public toggleLight(id: number): void {
-    const index = this.watches.findIndex((w) => w.getId() === id);
-    if (index !== -1) {
-      this.watches[index].toggleLight();
-    }
+    const index = this.getWatchIndex(id);
+    this.watches[index].toggleLight();
   }
 }
