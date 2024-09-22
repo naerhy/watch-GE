@@ -1,9 +1,10 @@
-import type { Watch } from "../shared";
+import { UtcTimeZone, utcTimezones, type Watch } from "../shared";
 
 type FnWithId = (id: number) => void;
 type Fns = [FnWithId, FnWithId, FnWithId, FnWithId];
 
 export default class WatchesView {
+  private selectTz: HTMLSelectElement;
   private addBtn: HTMLButtonElement;
   private watchesList: HTMLUListElement;
   private watchesItems: Map<number, HTMLLIElement>;
@@ -14,16 +15,29 @@ export default class WatchesView {
 
   public constructor() {
     const mainElement = document.createElement("main");
+    const addDiv = document.createElement("div");
+    this.selectTz = document.createElement("select");
+    for (const tz of utcTimezones) {
+      const opt = document.createElement("option");
+      opt.value = tz;
+      opt.textContent = tz;
+      opt.selected = tz === "UTC+00:00";
+      this.selectTz.appendChild(opt);
+    }
     this.addBtn = document.createElement("button");
+    this.addBtn.type = "button";
     this.addBtn.textContent = "Add";
+    addDiv.append(this.selectTz, this.addBtn);
     this.watchesList = document.createElement("ul");
-    mainElement.append(this.addBtn, this.watchesList);
+    mainElement.append(addDiv, this.watchesList);
     this.watchesItems = new Map();
     document.body.appendChild(mainElement);
   }
 
-  public setEvents(addBtnFn: () => void, fns: Fns) {
-    this.addBtn.addEventListener("click", addBtnFn);
+  public setEvents(addBtnFn: (utcTimezone: UtcTimeZone) => void, fns: Fns) {
+    this.addBtn.addEventListener("click", () => {
+      addBtnFn(this.selectTz.value as UtcTimeZone);
+    });
     this.modeBtnFn = fns[0];
     this.increaseBtnFn = fns[1];
     this.toggleLightBtnFn = fns[2];

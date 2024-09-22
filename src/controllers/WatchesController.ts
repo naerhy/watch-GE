@@ -1,5 +1,6 @@
 import TimeModel from "../models/TimeModel";
 import WatchesModel from "../models/WatchesModel";
+import { UtcTimeZone } from "../shared";
 import WatchesView from "../views/WatchesView";
 
 export default class WatchesController {
@@ -15,8 +16,8 @@ export default class WatchesController {
 
   public start(): void {
     this.watchesView.setEvents(
-      () => {
-        const newWatch = this.watchesModel.add();
+      (utcTimezone: UtcTimeZone) => {
+        const newWatch = this.watchesModel.add(utcTimezone);
         this.watchesView.addItem(newWatch);
       },
       [

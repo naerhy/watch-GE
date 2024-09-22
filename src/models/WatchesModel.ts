@@ -1,16 +1,21 @@
 import TimeModel from "./TimeModel";
-import { Observer, Subject, Watch } from "../shared";
+import { Observer, Subject, utcOffsets, UtcTimeZone, Watch } from "../shared";
 
 class WatchModel implements Observer {
   private id: number;
   private time: number;
+  private utcTimezone: UtcTimeZone;
   private mode: number;
   private increasedTime: number;
   private light: boolean;
 
-  public constructor(id: number, time: number) {
+  private readonly MS_MIN = 60000;
+  private readonly MS_HOUR = 3600000;
+
+  public constructor(id: number, time: number, utcTimezone: UtcTimeZone) {
     this.id = id;
     this.time = time;
+    this.utcTimezone = utcTimezone;
     this.mode = 0;
     this.increasedTime = 0;
     this.light = false;
@@ -21,8 +26,14 @@ class WatchModel implements Observer {
   }
 
   public getTimeText(): string {
-    const updatedTime = new Date(this.time + this.increasedTime);
-    const digits = [updatedTime.getHours(), updatedTime.getMinutes(), updatedTime.getSeconds()];
+    const updatedTime = new Date(
+      this.time + (utcOffsets[this.utcTimezone] * this.MS_MIN) + this.increasedTime
+    );
+    const digits = [
+      updatedTime.getUTCHours(),
+      updatedTime.getUTCMinutes(),
+      updatedTime.getUTCSeconds()
+    ];
     return digits.map((t) => t.toString().padStart(2, "0")).join(":");
   }
 
@@ -36,9 +47,9 @@ class WatchModel implements Observer {
 
   public increaseTime(): void {
     if (this.mode === 1) {
-      this.increasedTime += 3600000;
+      this.increasedTime += this.MS_HOUR;
     } else if (this.mode === 2) {
-      this.increasedTime += 60000;
+      this.increasedTime += this.MS_MIN;
     } else {}
   }
 
@@ -92,8 +103,8 @@ export default class WatchesModel {
     return this.transformModelToObject(watch);
   }
 
-  public add(): Watch {
-    const watch = new WatchModel(this.nextId, this.timeModel.getTime());
+  public add(utcTimezone: UtcTimeZone): Watch {
+    const watch = new WatchModel(this.nextId, this.timeModel.getTime(), utcTimezone);
     this.nextId++;
     this.watches.push(watch);
     this.timeModel.attach(watch);
