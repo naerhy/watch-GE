@@ -32,7 +32,6 @@ export default class WatchesView {
 
   public addItem(watch: Watch): void {
     const item = document.createElement("li");
-    item.classList.add("watch");
     const timeText = document.createElement("div");
     timeText.classList.add("time-text");
     timeText.innerText = watch.time;
@@ -91,7 +90,7 @@ export default class WatchesView {
       const timeText = item.querySelector<HTMLDivElement>(".time-text");
       if (timeText) {
         if (isActivated) {
-          timeText.style.backgroundColor = "#FBE106";
+          timeText.style.backgroundColor = "#fbe106";
         } else {
           timeText.style.removeProperty("background-color");
         }

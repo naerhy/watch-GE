@@ -1,15 +1,26 @@
-.watch {
-  align-items: center;
-  border: 1px solid red;
+body {
+  background-color: #f3f4f6;
+}
+
+ul {
   display: flex;
-  height: 300px;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+li {
+  align-items: center;
+  background-color: #4b5563;
+  border-radius: 1.5rem;
+  display: flex;
+  height: 250px;
   justify-content: center;
   position: relative;
-  width: 300px;
+  width: 250px;
 }
 
 .time-text {
-  background-color: red;
+  background-color: #ffffff;
   border-radius: 0.25rem;
   padding: 1rem;
 }
