@@ -19,7 +19,8 @@ export default class WatchesView {
 
   public constructor() {
     const mainElement = document.createElement("main");
-    const addDiv = document.createElement("div");
+    const topBar = document.createElement("div");
+    topBar.classList.add("topbar");
     this.selectTz = document.createElement("select");
     for (const tz of utcTimezones) {
       const opt = document.createElement("option");
@@ -38,10 +39,10 @@ export default class WatchesView {
     }
     this.addBtn = document.createElement("button");
     this.addBtn.type = "button";
-    this.addBtn.textContent = "Add";
-    addDiv.append(this.selectTz, this.selectWatchType, this.addBtn);
+    this.addBtn.textContent = "Add a new watch";
+    topBar.append(this.selectTz, this.selectWatchType, this.addBtn);
     this.watchesList = document.createElement("ul");
-    mainElement.append(addDiv, this.watchesList);
+    mainElement.append(topBar, this.watchesList);
     this.watchesItems = new Map();
     document.body.appendChild(mainElement);
   }
@@ -62,46 +63,45 @@ export default class WatchesView {
     const item = document.createElement("li");
     item.classList.add(type);
     this.setDragEvents(item, watch.id);
-    type === "analog" ? this.addAnalogWatch(item) : this.addDigitalWatch(item, watch);
+    const children = type === "analog"
+      ? this.addAnalogWatch(watch)
+      : this.addDigitalWatch(watch)
+    ;
     this.watchesItems.set(watch.id, item);
     this.watchesList.appendChild(item);
+    item.append(...children);
   }
 
-  private addAnalogWatch(item: HTMLLIElement): void {
+  private addAnalogWatch(watch: Watch): HTMLElement[] {
+    const children: HTMLElement[] = [];
+    children.push(this.createWatchButton("remove-btn", () => this.removeBtnFn?.(watch.id)));
     for (const i of [0, 1, 2]) {
       const el = document.createElement("div");
       el.classList.add("hand", `h-${i}`);
-      item.appendChild(el);
+      children.push(el);
     }
+    return children;
   }
 
-  private addDigitalWatch(item: HTMLLIElement, watch: Watch): void {
+  private addDigitalWatch(watch: Watch): HTMLElement[] {
     const timeText = document.createElement("div");
     timeText.classList.add("time-text");
     timeText.innerText = watch.time;
-    const modeBtn = this.createButton("switch-mode-btn", "Mode", () => {
+    const modeBtn = this.createWatchButton("switch-mode-btn", () => {
       this.switchModeBtnFn?.(watch.id);
     });
-    const increaseBtn = this.createButton("increase-btn", "Increase", () => {
+    const increaseBtn = this.createWatchButton("increase-btn", () => {
       this.increaseBtnFn?.(watch.id);
     });
-    const resetBtn = this.createButton("reset-btn", "Reset", () => this.resetBtnFn?.(watch.id));
-    const toggleTimeFormatBtn = this.createButton("toggle-time-format-btn", "AM/PM - 24H", () => {
+    const resetBtn = this.createWatchButton("reset-btn", () => this.resetBtnFn?.(watch.id));
+    const toggleTimeFormatBtn = this.createWatchButton("toggle-time-format-btn", () => {
       this.toggleTimeFormatBtn?.(watch.id);
     });
-    const toggleLightBtn = this.createButton("toggle-light-btn", "Light", () => {
+    const toggleLightBtn = this.createWatchButton("toggle-light-btn", () => {
       this.toggleLightBtnFn?.(watch.id);
     });
-    const removeBtn = this.createButton("remove-btn", "Remove", () => this.removeBtnFn?.(watch.id));
-    item.append(
-      timeText,
-      modeBtn,
-      increaseBtn,
-      resetBtn,
-      toggleTimeFormatBtn,
-      toggleLightBtn,
-      removeBtn
-    );
+    const removeBtn = this.createWatchButton("remove-btn", () => this.removeBtnFn?.(watch.id));
+    return [timeText, modeBtn, increaseBtn, resetBtn, toggleTimeFormatBtn, toggleLightBtn, removeBtn];
   }
 
   private setDragEvents(element: HTMLElement, id: number): void {
@@ -130,10 +130,9 @@ export default class WatchesView {
     });
   }
 
-  private createButton(className: string, text: string, evt: () => void) {
+  private createWatchButton(className: string, evt: () => void) {
     const btn = document.createElement("button");
     btn.classList.add(className);
-    btn.textContent = text;
     btn.addEventListener("click", evt);
     return btn;
   }
@@ -185,7 +184,7 @@ export default class WatchesView {
       const timeText = item.querySelector<HTMLDivElement>(".time-text");
       if (timeText) {
         if (isActivated) {
-          timeText.style.backgroundColor = "#fbe106";
+          timeText.style.backgroundColor = "#fef08a";
         } else {
           timeText.style.removeProperty("background-color");
         }
