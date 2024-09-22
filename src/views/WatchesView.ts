@@ -1,79 +1,101 @@
-import WatchModel from "../models/WatchModel";
+import type { Watch } from "../shared";
+
+type FnWithId = (id: number) => void;
+type Fns = [FnWithId, FnWithId, FnWithId, FnWithId];
 
 export default class WatchesView {
-  private mainElement: HTMLElement;
   private addBtn: HTMLButtonElement;
-  private currentList: HTMLUListElement;
-  private modeBtnEvent?: ((id: number) => void);
-  private increaseBtnEvent?: ((id: number) => void);
-  private toggleLightBtnEvent?: ((id: number) => void);
-  private removeBtnEvent?: ((id: number) => void);
+  private watchesList: HTMLUListElement;
+  private watchesItems: Map<number, HTMLLIElement>;
+  private modeBtnFn?: FnWithId;
+  private increaseBtnFn?: FnWithId;
+  private toggleLightBtnFn?: FnWithId;
+  private removeBtnFn?: FnWithId;
 
   public constructor() {
-    this.mainElement = document.createElement("main");
+    const mainElement = document.createElement("main");
     this.addBtn = document.createElement("button");
     this.addBtn.textContent = "Add";
-    this.currentList = document.createElement("ul");
-    this.mainElement.append(this.addBtn, this.currentList);
-    document.body.appendChild(this.mainElement);
+    this.watchesList = document.createElement("ul");
+    mainElement.append(this.addBtn, this.watchesList);
+    this.watchesItems = new Map();
+    document.body.appendChild(mainElement);
   }
 
-  public setAddBtnEvent(evt: () => void): void {
-    this.addBtn.addEventListener("click", evt);
+  public setEvents(addBtnFn: () => void, fns: Fns) {
+    this.addBtn.addEventListener("click", addBtnFn);
+    this.modeBtnFn = fns[0];
+    this.increaseBtnFn = fns[1];
+    this.toggleLightBtnFn = fns[2];
+    this.removeBtnFn = fns[3];
   }
 
-  public setModeBtnEvent(evt: (id: number) => void): void {
-    this.modeBtnEvent = evt;
+  public addItem(watch: Watch): void {
+    const item = document.createElement("li");
+    item.classList.add("watch");
+    const timeText = document.createElement("div");
+    timeText.classList.add("time-text");
+    timeText.innerText = watch.time;
+    const modeBtn = document.createElement("button");
+    modeBtn.classList.add("mode-btn");
+    modeBtn.textContent = "Mode";
+    modeBtn.addEventListener("click", () => {
+      this.modeBtnFn?.(watch.id);
+    });
+    const increaseBtn = document.createElement("button");
+    increaseBtn.classList.add("increase-btn");
+    increaseBtn.textContent = "Increase";
+    increaseBtn.addEventListener("click", () => {
+      this.increaseBtnFn?.(watch.id);
+    });
+    const toggleLightBtn = document.createElement("button");
+    toggleLightBtn.classList.add("toggle-light-btn");
+    toggleLightBtn.textContent = "Light";
+    toggleLightBtn.addEventListener("click", () => {
+      this.toggleLightBtnFn?.(watch.id);
+    });
+    const removeBtn = document.createElement("button");
+    removeBtn.classList.add("remove-btn");
+    removeBtn.textContent = "Remove";
+    removeBtn.addEventListener("click", () => {
+      this.removeBtnFn?.(watch.id);
+    }, { once: true });
+    item.append(timeText, modeBtn, increaseBtn, toggleLightBtn, removeBtn);
+    this.watchesItems.set(watch.id, item);
+    this.watchesList.appendChild(item);
   }
 
-  public setIncreaseBtnEvent(evt: (id: number) => void): void {
-    this.increaseBtnEvent = evt;
-  }
-
-  public setToggleLightBtnEvent(evt: (id: number) => void): void {
-    this.toggleLightBtnEvent = evt;
-  }
-
-  public setRemoveBtnEvent(evt: (id: number) => void): void {
-    this.removeBtnEvent = evt;
-  }
-
-  public render(watches: WatchModel[]): void {
-    const list = document.createElement("ul");
-    for (const w of watches) {
-      const li = document.createElement("li");
-      li.classList.add("watch");
-      const div = document.createElement("div");
-      div.style.backgroundColor = w.getLight() ? "#FBE106" : "#FFFFFF";
-      div.innerText = w.getTimeText();
-      const modeBtn = document.createElement("button");
-      modeBtn.classList.add("mode-btn");
-      modeBtn.textContent = "Mode";
-      modeBtn.addEventListener("click", () => {
-        this.modeBtnEvent?.(w.getId());
-      }, { once: true });
-      const increaseBtn = document.createElement("button");
-      increaseBtn.classList.add("increase-btn");
-      increaseBtn.textContent = "Increase";
-      increaseBtn.addEventListener("click", () => {
-        this.increaseBtnEvent?.(w.getId());
-      }, { once: true });
-      const toggleLightBtn = document.createElement("button");
-      toggleLightBtn.classList.add("toggle-light-btn");
-      toggleLightBtn.textContent = "Light";
-      toggleLightBtn.addEventListener("click", () => {
-        this.toggleLightBtnEvent?.(w.getId());
-      }, { once: true });
-      const removeBtn = document.createElement("button");
-      removeBtn.classList.add("remove-btn");
-      removeBtn.textContent = "Remove";
-      removeBtn.addEventListener("click", () => {
-        this.removeBtnEvent?.(w.getId());
-      }, { once: true });
-      li.append(div, modeBtn, increaseBtn, toggleLightBtn, removeBtn);
-      list.appendChild(li);
+  public removeItem(id: number): void {
+    const item = this.watchesItems.get(id);
+    if (item) {
+      this.watchesList.removeChild(item);
+      this.watchesItems.delete(id);
     }
-    this.mainElement.replaceChild(list, this.currentList);
-    this.currentList = list;
-  } 
+  }
+
+  public updateTimeTexts(watches: Watch[]): void {
+    for (const w of watches) {
+      const item = this.watchesItems.get(w.id);
+      if (item) {
+        const timeText = item.querySelector(".time-text");
+        if (timeText) {
+          timeText.textContent = w.time;
+        }
+      }
+    }
+  }
+
+  public updateLight(id: number, isActivated: boolean): void {
+    const item = this.watchesItems.get(id);
+    if (item) {
+      const timeText = item.querySelector<HTMLDivElement>(".time-text");
+      if (timeText) {
+        if (isActivated) {
+          timeText.style.backgroundColor = "#FBE106";
+        } else {
+          timeText.style.removeProperty("background-color");
+        }
+      }
+    }
+  }
 }

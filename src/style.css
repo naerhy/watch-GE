@@ -8,6 +8,12 @@
   width: 300px;
 }
 
+.time-text {
+  background-color: red;
+  border-radius: 0.25rem;
+  padding: 1rem;
+}
+
 .mode-btn {
   bottom: 20px;
   left: 20px;

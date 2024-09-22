@@ -7,3 +7,9 @@ export interface Subject {
 export interface Observer {
   update(subject: Subject): void;
 }
+
+export interface Watch {
+  id: number;
+  time: string;
+  light: boolean;
+}
