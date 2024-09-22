@@ -55,7 +55,7 @@ export const utcTimezones = [
   "UTC+14:00"
 ] as const;
 
-export type UtcTimeZone = typeof utcTimezones[number];
+export type UtcTimeZone = (typeof utcTimezones)[number];
 
 export const utcOffsets: Record<UtcTimeZone, number> = {
   "UTC-12:00": -720,

@@ -10,14 +10,7 @@ html,
   -moz-tab-size: 4;
   -webkit-tap-highlight-color: transparent;
   -webkit-text-size-adjust: 100%;
-  font-family:
-    system-ui,
-    "Segoe UI",
-    Roboto,
-    Helvetica,
-    Arial,
-    sans-serif,
-    "Apple Color Emoji",
+  font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji",
     "Segoe UI Emoji";
   line-height: 1.5;
   tab-size: 4;
@@ -52,7 +45,9 @@ li {
   background-size: cover;
   border: 2px solid #111827;
   border-radius: 50%;
-  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  box-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 0.1),
+    0 2px 4px -2px rgb(0 0 0 / 0.1);
   height: 250px;
   position: relative;
   width: 250px;
@@ -70,7 +65,6 @@ li > button {
 li > button:hover {
   background-color: #d1d5db;
 }
-
 
 button,
 select {

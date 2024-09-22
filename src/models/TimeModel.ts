@@ -1,6 +1,5 @@
 import { Observer, Subject } from "../shared";
 
-// TODO: create Observer class/model to replace WatchModel
 export default class TimeModel implements Subject {
   private time: number;
   private observers: Observer[];

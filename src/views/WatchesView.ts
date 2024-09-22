@@ -63,10 +63,7 @@ export default class WatchesView {
     const item = document.createElement("li");
     item.classList.add(type);
     this.setDragEvents(item, watch.id);
-    const children = type === "analog"
-      ? this.addAnalogWatch(watch)
-      : this.addDigitalWatch(watch)
-    ;
+    const children = type === "analog" ? this.addAnalogWatch(watch) : this.addDigitalWatch(watch);
     this.watchesItems.set(watch.id, item);
     this.watchesList.appendChild(item);
     item.append(...children);
@@ -101,7 +98,15 @@ export default class WatchesView {
       this.toggleLightBtnFn?.(watch.id);
     });
     const removeBtn = this.createWatchButton("remove-btn", () => this.removeBtnFn?.(watch.id));
-    return [timeText, modeBtn, increaseBtn, resetBtn, toggleTimeFormatBtn, toggleLightBtn, removeBtn];
+    return [
+      timeText,
+      modeBtn,
+      increaseBtn,
+      resetBtn,
+      toggleTimeFormatBtn,
+      toggleLightBtn,
+      removeBtn
+    ];
   }
 
   private setDragEvents(element: HTMLElement, id: number): void {
@@ -122,7 +127,10 @@ export default class WatchesView {
         if (first && second) {
           const children = Array.from(this.watchesList.children);
           const indexes: [number, number] = [children.indexOf(first), children.indexOf(second)];
-          [children[indexes[0]], children[indexes[1]]] = [children[indexes[1]], children[indexes[0]]];
+          [children[indexes[0]], children[indexes[1]]] = [
+            children[indexes[1]],
+            children[indexes[0]]
+          ];
           this.watchesList.innerHTML = "";
           this.watchesList.append(...children);
         }
@@ -152,9 +160,9 @@ export default class WatchesView {
         if (item.classList.contains("analog")) {
           const [hours, minutes, seconds] = w.time.split(":").map((t) => Number(t));
           const radians = [
-            (((hours + minutes / 60) / 12) * 360) * (Math.PI / 180),
-            (((minutes + seconds / 60) / 60) * 360) * (Math.PI / 180),
-            ((seconds / 60) * 360) * (Math.PI / 180)
+            ((hours + minutes / 60) / 12) * 360 * (Math.PI / 180),
+            ((minutes + seconds / 60) / 60) * 360 * (Math.PI / 180),
+            (seconds / 60) * 360 * (Math.PI / 180)
           ];
           const hands = item.querySelectorAll<HTMLElement>(".hand");
           for (const [i, h] of hands.entries()) {

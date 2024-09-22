@@ -29,7 +29,7 @@ class WatchModel implements Observer {
 
   public getTimeText(): string {
     const updatedDate = new Date(
-      this.time + (utcOffsets[this.utcTimezone] * this.MS_MIN) + this.increasedTime
+      this.time + utcOffsets[this.utcTimezone] * this.MS_MIN + this.increasedTime
     );
     const digits = [
       updatedDate.getUTCHours(),
@@ -58,7 +58,9 @@ class WatchModel implements Observer {
       this.increasedTime += this.MS_HOUR;
     } else if (this.mode === 2) {
       this.increasedTime += this.MS_MIN;
-    } else {}
+    } else {
+      // no rule
+    }
   }
 
   public resetTime(): void {
