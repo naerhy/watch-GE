@@ -1,7 +1,7 @@
 import { UtcTimeZone, utcTimezones, type Watch } from "../shared";
 
 type FnWithId = (id: number) => void;
-type Fns = [FnWithId, FnWithId, FnWithId, FnWithId];
+type Fns = [FnWithId, FnWithId, FnWithId, FnWithId, FnWithId];
 
 export default class WatchesView {
   private selectTz: HTMLSelectElement;
@@ -10,6 +10,7 @@ export default class WatchesView {
   private watchesItems: Map<number, HTMLLIElement>;
   private modeBtnFn?: FnWithId;
   private increaseBtnFn?: FnWithId;
+  private resetBtnFn?: FnWithId;
   private toggleLightBtnFn?: FnWithId;
   private removeBtnFn?: FnWithId;
 
@@ -40,8 +41,9 @@ export default class WatchesView {
     });
     this.modeBtnFn = fns[0];
     this.increaseBtnFn = fns[1];
-    this.toggleLightBtnFn = fns[2];
-    this.removeBtnFn = fns[3];
+    this.resetBtnFn = fns[2];
+    this.toggleLightBtnFn = fns[3];
+    this.removeBtnFn = fns[4];
   }
 
   public addItem(watch: Watch): void {
@@ -61,6 +63,12 @@ export default class WatchesView {
     increaseBtn.addEventListener("click", () => {
       this.increaseBtnFn?.(watch.id);
     });
+    const resetBtn = document.createElement("button");
+    resetBtn.classList.add("reset-btn");
+    resetBtn.textContent = "Reset";
+    resetBtn.addEventListener("click", () => {
+      this.resetBtnFn?.(watch.id);
+    });
     const toggleLightBtn = document.createElement("button");
     toggleLightBtn.classList.add("toggle-light-btn");
     toggleLightBtn.textContent = "Light";
@@ -73,7 +81,7 @@ export default class WatchesView {
     removeBtn.addEventListener("click", () => {
       this.removeBtnFn?.(watch.id);
     }, { once: true });
-    item.append(timeText, modeBtn, increaseBtn, toggleLightBtn, removeBtn);
+    item.append(timeText, modeBtn, increaseBtn, resetBtn, toggleLightBtn, removeBtn);
     this.watchesItems.set(watch.id, item);
     this.watchesList.appendChild(item);
   }

@@ -53,6 +53,10 @@ class WatchModel implements Observer {
     } else {}
   }
 
+  public resetTime(): void {
+    this.increasedTime = 0;
+  }
+
   public toggleLight(): void {
     this.light = !this.light;
   }
@@ -125,6 +129,11 @@ export default class WatchesModel {
   public increaseTime(id: number): void {
     const index = this.getWatchIndex(id);
     this.watches[index].increaseTime();
+  }
+
+  public resetTime(id: number): void {
+    const index = this.getWatchIndex(id);
+    this.watches[index].resetTime();
   }
 
   public toggleLight(id: number): void {
