@@ -8,7 +8,7 @@ export default class WatchesView {
   private addBtn: HTMLButtonElement;
   private watchesList: HTMLUListElement;
   private watchesItems: Map<number, HTMLLIElement>;
-  private modeBtnFn?: FnWithId;
+  private switchModeBtnFn?: FnWithId;
   private increaseBtnFn?: FnWithId;
   private resetBtnFn?: FnWithId;
   private toggleTimeFormatBtn?: FnWithId;
@@ -40,7 +40,7 @@ export default class WatchesView {
     this.addBtn.addEventListener("click", () => {
       addBtnFn(this.selectTz.value as UtcTimeZone);
     });
-    this.modeBtnFn = fns[0];
+    this.switchModeBtnFn = fns[0];
     this.increaseBtnFn = fns[1];
     this.resetBtnFn = fns[2];
     this.toggleTimeFormatBtn = fns[3];
@@ -50,68 +50,24 @@ export default class WatchesView {
 
   public addItem(watch: Watch): void {
     const item = document.createElement("li");
-    item.draggable = true;
-    item.addEventListener("dragstart", (evt) => {
-      if (evt.dataTransfer) {
-        evt.dataTransfer.setData("text/plain", watch.id.toString());
-        evt.dataTransfer.effectAllowed = "move";
-      }
-    });
-    item.addEventListener("dragover", (evt) => evt.preventDefault());
-    item.addEventListener("drop", (evt) => {
-      evt.preventDefault();
-      const data = evt.dataTransfer?.getData("text/plain");
-      if (data && Number(data) !== watch.id) {
-        const first = this.watchesItems.get(Number(data));
-        const second = this.watchesItems.get(watch.id);
-        if (first && second) {
-          const children = Array.from(this.watchesList.children);
-          const indexes: [number, number] = [children.indexOf(first), children.indexOf(second)];
-          [children[indexes[0]], children[indexes[1]]] = [children[indexes[1]], children[indexes[0]]];
-          this.watchesList.innerHTML = "";
-          this.watchesList.append(...children);
-        }
-      }
-    });
+    this.setDragEvents(item, watch.id);
     const timeText = document.createElement("div");
     timeText.classList.add("time-text");
     timeText.innerText = watch.time;
-    const modeBtn = document.createElement("button");
-    modeBtn.classList.add("mode-btn");
-    modeBtn.textContent = "Mode";
-    modeBtn.addEventListener("click", () => {
-      this.modeBtnFn?.(watch.id);
+    const modeBtn = this.createButton("switch-mode-btn", "Mode", () => {
+      this.switchModeBtnFn?.(watch.id);
     });
-    const increaseBtn = document.createElement("button");
-    increaseBtn.classList.add("increase-btn");
-    increaseBtn.textContent = "Increase";
-    increaseBtn.addEventListener("click", () => {
+    const increaseBtn = this.createButton("increase-btn", "Increase", () => {
       this.increaseBtnFn?.(watch.id);
     });
-    const resetBtn = document.createElement("button");
-    resetBtn.classList.add("reset-btn");
-    resetBtn.textContent = "Reset";
-    resetBtn.addEventListener("click", () => {
-      this.resetBtnFn?.(watch.id);
-    });
-    const toggleTimeFormatBtn = document.createElement("button");
-    toggleTimeFormatBtn.classList.add("toggle-time-format-btn");
-    toggleTimeFormatBtn.textContent = "AM/PM - 24H";
-    toggleTimeFormatBtn.addEventListener("click", () => {
+    const resetBtn = this.createButton("reset-btn", "Reset", () => this.resetBtnFn?.(watch.id));
+    const toggleTimeFormatBtn = this.createButton("toggle-time-format-btn", "AM/PM - 24H", () => {
       this.toggleTimeFormatBtn?.(watch.id);
     });
-    const toggleLightBtn = document.createElement("button");
-    toggleLightBtn.classList.add("toggle-light-btn");
-    toggleLightBtn.textContent = "Light";
-    toggleLightBtn.addEventListener("click", () => {
+    const toggleLightBtn = this.createButton("toggle-light-btn", "Light", () => {
       this.toggleLightBtnFn?.(watch.id);
     });
-    const removeBtn = document.createElement("button");
-    removeBtn.classList.add("remove-btn");
-    removeBtn.textContent = "Remove";
-    removeBtn.addEventListener("click", () => {
-      this.removeBtnFn?.(watch.id);
-    }, { once: true });
+    const removeBtn = this.createButton("remove-btn", "Remove", () => this.removeBtnFn?.(watch.id));
     item.append(
       timeText,
       modeBtn,
@@ -123,6 +79,40 @@ export default class WatchesView {
     );
     this.watchesItems.set(watch.id, item);
     this.watchesList.appendChild(item);
+  }
+
+  private setDragEvents(element: HTMLElement, id: number): void {
+    element.draggable = true;
+    element.addEventListener("dragstart", (evt) => {
+      if (evt.dataTransfer) {
+        evt.dataTransfer.setData("text/plain", id.toString());
+        evt.dataTransfer.effectAllowed = "move";
+      }
+    });
+    element.addEventListener("dragover", (evt) => evt.preventDefault());
+    element.addEventListener("drop", (evt) => {
+      evt.preventDefault();
+      const data = evt.dataTransfer?.getData("text/plain");
+      if (data && Number(data) !== id) {
+        const first = this.watchesItems.get(Number(data));
+        const second = this.watchesItems.get(id);
+        if (first && second) {
+          const children = Array.from(this.watchesList.children);
+          const indexes: [number, number] = [children.indexOf(first), children.indexOf(second)];
+          [children[indexes[0]], children[indexes[1]]] = [children[indexes[1]], children[indexes[0]]];
+          this.watchesList.innerHTML = "";
+          this.watchesList.append(...children);
+        }
+      }
+    });
+  }
+
+  private createButton(className: string, text: string, evt: () => void) {
+    const btn = document.createElement("button");
+    btn.classList.add(className);
+    btn.textContent = text;
+    btn.addEventListener("click", evt);
+    return btn;
   }
 
   public removeItem(id: number): void {
