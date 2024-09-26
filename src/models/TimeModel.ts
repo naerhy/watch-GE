@@ -1,4 +1,4 @@
-import { Observer, Subject } from "../shared";
+import type { Observer, Subject } from "../shared";
 
 export default class TimeModel implements Subject {
   private time: number;

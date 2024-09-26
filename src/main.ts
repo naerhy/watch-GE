@@ -1,8 +1,6 @@
 import "./style.css";
-import WatchesModel from "./models/WatchesModel";
-import WatchesView from "./views/WatchesView";
-import WatchesController from "./controllers/WatchesController";
+import WatchesCollectionModel from "./models/WatchesCollectionModel";
+import WatchesCollectionView from "./views/WatchesCollectionView";
+import WatchesCollectionController from "./controllers/WatchesCollectionController";
 
-const watchesModel = new WatchesModel();
-const watchesView = new WatchesView();
-new WatchesController(watchesModel, watchesView).start();
+new WatchesCollectionController(new WatchesCollectionModel(), new WatchesCollectionView()).start();

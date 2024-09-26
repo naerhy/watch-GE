@@ -1,3 +1,15 @@
+import TimeModel from "./models/TimeModel";
+
+export interface Time {
+  hours: number;
+  minutes: number;
+  seconds: number;
+}
+
+export type WatchType = "analog" | "digital";
+
+export type TimeFormat = 12 | 24;
+
 export interface Subject {
   attach(observer: Observer): void;
   detach(observer: Observer): void;
@@ -8,11 +20,49 @@ export interface Observer {
   update(subject: Subject): void;
 }
 
-export interface Watch {
+export abstract class Watch implements Observer {
+  protected id: number;
+  protected time: number;
+  protected utcTimezone: UtcTimezone;
+
+  protected readonly MS_MIN = 60000;
+  protected readonly MS_HOUR = 3600000;
+
+  protected constructor(id: number, time: number, utcTimezone: UtcTimezone) {
+    this.id = id;
+    this.time = time;
+    this.utcTimezone = utcTimezone;
+  }
+
+  protected abstract getTime(): Time;
+
+  public abstract serialize(): SerializedWatch;
+
+  public update(subject: Subject): void {
+    if (subject instanceof TimeModel) {
+      this.time = subject.getTime();
+    }
+  }
+}
+
+export interface SerializedAnalogWatch {
+  type: "analog";
   id: number;
-  time: string;
+  time: Time;
+  utcTimezone: UtcTimezone;
+}
+
+export interface SerializedDigitalWatch {
+  type: "digital";
+  id: number;
+  time: Time;
+  utcTimezone: UtcTimezone;
+  mode: number;
+  timeFormat: TimeFormat;
   light: boolean;
 }
+
+export type SerializedWatch = SerializedAnalogWatch | SerializedDigitalWatch;
 
 export const utcTimezones = [
   "UTC-12:00",
@@ -55,9 +105,9 @@ export const utcTimezones = [
   "UTC+14:00"
 ] as const;
 
-export type UtcTimeZone = (typeof utcTimezones)[number];
+export type UtcTimezone = (typeof utcTimezones)[number];
 
-export const utcOffsets: Record<UtcTimeZone, number> = {
+export const utcOffsets: Record<UtcTimezone, number> = {
   "UTC-12:00": -720,
   "UTC-11:00": -660,
   "UTC-10:00": -600,

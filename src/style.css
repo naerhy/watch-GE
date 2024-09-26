@@ -126,6 +126,10 @@ select {
   padding: 1rem;
 }
 
+.ampm {
+  margin-left: 0.25rem;
+}
+
 .switch-mode-btn {
   bottom: 40px;
   left: 40px;
@@ -181,4 +185,20 @@ select {
   background-color: red;
   height: 110px;
   width: 2px;
+}
+
+@keyframes blink {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.blink {
+  animation: blink 1s infinite;
 }
